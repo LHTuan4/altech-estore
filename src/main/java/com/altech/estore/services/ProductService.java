@@ -1,5 +1,6 @@
 package com.altech.estore.services;
 
+import com.altech.estore.dto.ProductDTO;
 import com.altech.estore.entities.ProductEntity;
 import com.altech.estore.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,25 +15,37 @@ public class ProductService{
 
     private final ProductRepository repository;
 
-    public ProductEntity addProduct(ProductEntity productEntity) {
+    public ProductDTO addProduct(ProductDTO productDTO) {
+        ProductEntity productEntity = ProductDTO.ToEntity(productDTO);
         long now = System.currentTimeMillis();
         productEntity.setTimeCreated(now);
 
-        return repository.save(productEntity);
+        return ProductDTO.FromEntity(repository.save(productEntity));
     }
-    public ProductEntity updateProduct(ProductEntity productEntity) {
+    public ProductDTO updateProduct(ProductDTO productDTO) {
         productLock.lock();
         try {
-            ProductEntity curProduct = repository.findById(productEntity.getId())
+            ProductEntity curProduct = repository.findById(productDTO.getId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
             long now = System.currentTimeMillis();
-            curProduct.setName(productEntity.getName());
-            curProduct.setPrice(productEntity.getPrice());
-            curProduct.setStock(productEntity.getStock());
+            curProduct.setName(productDTO.getName());
+            curProduct.setPrice(productDTO.getPrice());
+            curProduct.setStock(productDTO.getStock());
             curProduct.setTimeUpdated(now);
 
-            return repository.save(curProduct);
+            return ProductDTO.FromEntity(repository.save(curProduct));
+        } finally {
+            productLock.unlock();
+        }
+    }
+
+    public void deleteProduct(Long id) {
+        productLock.lock();
+        try {
+            ProductEntity product = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            repository.delete(product);
         } finally {
             productLock.unlock();
         }

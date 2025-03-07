@@ -22,6 +22,8 @@ public class DiscountEntity {
     @Column(columnDefinition = "json")
     private String discountConfig;
 
+    private long discountMax;
+    private int discountPercent;
     private long timeCreated;
     private long timeUpdated;
 }
