@@ -15,6 +15,9 @@ public class ProductService{
 
     private final ProductRepository repository;
 
+    public ProductDTO getProduct(Long productId) {
+        return ProductDTO.FromEntity(repository.findById(productId).orElseThrow(()->new RuntimeException("Product not found")));
+    }
     public ProductDTO addProduct(ProductDTO productDTO) {
         ProductEntity productEntity = ProductDTO.ToEntity(productDTO);
         long now = System.currentTimeMillis();
