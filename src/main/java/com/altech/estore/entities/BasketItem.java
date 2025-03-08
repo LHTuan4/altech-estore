@@ -1,12 +1,14 @@
 package com.altech.estore.entities;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+@Embeddable
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -17,7 +17,7 @@ public class BasketEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<BasketItem> items;
 
     private BigDecimal originalPriceTotal = BigDecimal.ZERO;
