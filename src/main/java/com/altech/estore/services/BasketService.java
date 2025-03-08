@@ -29,11 +29,16 @@ public class BasketService {
     private final ProductDiscountsRepository productDiscountsRepository;
     private final DiscountService discountService;
 
-    public BasketEntity add(BasketEntity basketEntity) {
+    public BasketDTO get(Long basketId) {
+        return BasketDTO.FromBasketEntity(basketRepository.findById(basketId)
+                .orElseThrow(() -> new RuntimeException("Basket not found")));
+    }
+    public BasketDTO add(BasketDTO basketDTO) {
+        BasketEntity basketEntity = BasketDTO.ToBasketEntity(basketDTO);
         long now = System.currentTimeMillis();
         basketEntity.setTimeCreated(now);
 
-        return basketRepository.save(basketEntity);
+        return BasketDTO.FromBasketEntity(basketRepository.save(basketEntity));
     }
 
     public BasketDTO addToBasket(Long basketId, Long productId, int quantity) {
