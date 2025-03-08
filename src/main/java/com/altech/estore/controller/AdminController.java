@@ -6,6 +6,7 @@ import com.altech.estore.response.ResponseApi;
 import com.altech.estore.response.ResponseError;
 import com.altech.estore.services.DiscountService;
 import com.altech.estore.services.ProductService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,15 @@ public class AdminController {
         this.discountService = discountService;
     }
 
+    @GetMapping("/product/get")
+    public ResponseEntity<ResponseApi> getProductById(@RequestParam Long id) {
+        try {
+            return ResponseEntity.ok(new ResponseApi(ResponseError.Error_Success, productService.getProduct(id)));
+        } catch (Exception ex) {
+        }
+        return ResponseEntity.ok(new ResponseApi(ResponseError.Error_Exception));
+    }
+
     @PostMapping("/product/add")
     public ResponseEntity<ResponseApi> createProduct(@RequestBody ProductDTO productDTO) {
         try {
@@ -33,8 +43,8 @@ public class AdminController {
         return ResponseEntity.ok(new ResponseApi(ResponseError.Error_Exception));
     }
 
-    @PostMapping("/product/remove/{id}")
-    public ResponseEntity<ResponseApi> deleteProduct(@PathVariable Long id) {
+    @PostMapping("/product/remove")
+    public ResponseEntity<ResponseApi> deleteProduct(@RequestBody Long id) {
         try {
             productService.deleteProduct(id);
             return ResponseEntity.ok().build();
@@ -42,7 +52,6 @@ public class AdminController {
 
         }
         return ResponseEntity.ok(new ResponseApi(ResponseError.Error_Exception));
-
     }
 
     @PostMapping("/discount/add")
