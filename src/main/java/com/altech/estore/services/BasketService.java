@@ -123,7 +123,7 @@ public class BasketService {
     }
 
 
-    private void recalculateBasket(BasketEntity basket) {
+    public void recalculateBasket(BasketEntity basket) {
         BigDecimal originalTotal = BigDecimal.ZERO;
         BigDecimal finalTotal = BigDecimal.ZERO;
 
