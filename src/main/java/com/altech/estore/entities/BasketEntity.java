@@ -17,7 +17,7 @@ public class BasketEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     private List<BasketItem> items;
 
     private BigDecimal originalPriceTotal = BigDecimal.ZERO;

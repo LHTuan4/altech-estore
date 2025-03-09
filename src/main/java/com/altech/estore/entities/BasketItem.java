@@ -35,7 +35,8 @@ public class BasketItem {
     private static BigDecimal calDiscountItem(BasketItem basketItem, DiscountEntity discount) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode config = objectMapper.readTree(discount.getDiscountConfig());
+            String cleanedJsonString = objectMapper.readValue(discount.getDiscountConfig(), String.class);
+            JsonNode config = objectMapper.readTree(cleanedJsonString);
 
             switch (discount.getDiscountType()) {
                 case ADDTIONAL_ITEM:
@@ -43,8 +44,8 @@ public class BasketItem {
                     if (basketItem.getQuantity() < quantity) {
                         return BigDecimal.ZERO;
                     }
-                    double discountItems = Math.floor(basketItem.getQuantity() * 0.0 / quantity);
-                    return BigDecimal.valueOf(discountItems *(basketItem.getUnitPrice().longValue() * (1 - discount.getDiscountPercent() / 100)));
+                    double discountItems = Math.floor(basketItem.getQuantity() * 1.0 / quantity);
+                    return BigDecimal.valueOf(discountItems *(basketItem.getUnitPrice().longValue() * (1 - discount.getDiscountPercent() * 1.0 / 100)));
 
                 default:
                     return BigDecimal.ZERO;
@@ -59,7 +60,7 @@ public class BasketItem {
         basketItem.setProductId(productEntity.getId());
         basketItem.setQuantity(quantity);
         basketItem.setUnitPrice(productEntity.getPrice());
-        basketItem.setOriginalPrice(productEntity.getPrice().multiply(basketItem.getUnitPrice()));
+        basketItem.setOriginalPrice(productEntity.getPrice().multiply(BigDecimal.valueOf(basketItem.getQuantity())));
         basketItem.setDiscountPrice(BigDecimal.ZERO);
         basketItem.setTotalPrice(basketItem.getOriginalPrice());
         return basketItem;

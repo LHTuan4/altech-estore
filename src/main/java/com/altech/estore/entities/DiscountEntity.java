@@ -19,9 +19,7 @@ public class DiscountEntity {
     @Enumerated(EnumType.STRING)
     private TypeDef.DiscountType discountType;
 
-    @Column(columnDefinition = "json")
     private String discountConfig;
-
     private long discountMax;
     private int discountPercent;
     private long timeCreated;
