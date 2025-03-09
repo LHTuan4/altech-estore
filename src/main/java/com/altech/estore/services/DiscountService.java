@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,6 @@ public class DiscountService {
     public List<Long> getDiscountByProduct(Long productId) {
         return productDiscountsRepository.findById(productId)
                 .map(ProductDiscountsEntity::getDiscountIds)
-                .orElse(null);
+                .orElse(new ArrayList<>());
     }
 }
