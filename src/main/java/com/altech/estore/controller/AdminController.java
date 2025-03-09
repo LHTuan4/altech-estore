@@ -2,11 +2,11 @@ package com.altech.estore.controller;
 
 import com.altech.estore.dto.DiscountDTO;
 import com.altech.estore.dto.ProductDTO;
+import com.altech.estore.params.ParamsAssignDiscount;
 import com.altech.estore.response.ResponseApi;
 import com.altech.estore.response.ResponseError;
 import com.altech.estore.services.DiscountService;
 import com.altech.estore.services.ProductService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +58,7 @@ public class AdminController {
     public ResponseEntity<ResponseApi> createDiscount(@RequestBody DiscountDTO discountDTO) {
         try {
             DiscountDTO ret = discountService.addDiscount(discountDTO);
-            return ResponseEntity.ok(new ResponseApi(ResponseError.Error_Success));
+            return ResponseEntity.ok(new ResponseApi(ResponseError.Error_Success, ret));
         } catch (Exception ex) {
 
         }
@@ -66,9 +66,9 @@ public class AdminController {
     }
 
     @PostMapping("/discount/assign")
-    public ResponseEntity<ResponseApi> assignDiscountToProduct(@RequestBody Long discountId, @RequestBody Long productId) {
+    public ResponseEntity<ResponseApi> assignDiscountToProduct(@RequestBody ParamsAssignDiscount params) {
         try {
-            discountService.assignDiscountToProduct(discountId, productId);
+            discountService.assignDiscountToProduct(params.getDiscountId(), params.getProductId());
             return ResponseEntity.ok(new ResponseApi(ResponseError.Error_Success));
         } catch (Exception ex) {
 
