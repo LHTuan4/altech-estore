@@ -5,15 +5,14 @@ import com.altech.estore.entities.BasketEntity;
 import com.altech.estore.entities.BasketItem;
 import com.altech.estore.entities.DiscountEntity;
 import com.altech.estore.entities.ProductEntity;
-import com.altech.estore.repository.BasketRepository;
-import com.altech.estore.repository.DiscountRepository;
-import com.altech.estore.repository.ProductDiscountsRepository;
-import com.altech.estore.repository.ProductRepository;
+import com.altech.estore.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
@@ -26,12 +25,18 @@ public class BasketService {
     private final BasketRepository basketRepository;
     private final ProductRepository productRepository;
     private final DiscountRepository discountRepository;
-    private final ProductDiscountsRepository productDiscountsRepository;
+//    private final BasketEntityItemsRepository basketItemsRepository;
     private final DiscountService discountService;
 
     public BasketDTO get(Long basketId) {
-        return BasketDTO.FromBasketEntity(basketRepository.findById(basketId)
-                .orElseThrow(() -> new RuntimeException("Basket not found")));
+        Optional<BasketEntity> basketEntity = basketRepository.findById(basketId);
+        if (basketEntity.isPresent()) {
+            BasketEntity basket = basketEntity.get();
+//            List<BasketItem> basketItems = basketItemsRepository.findAllById(Collections.singletonList(basket.getId()));
+//            basket.setItems(basketItems);
+            return BasketDTO.FromBasketEntity(basket);
+        }
+        return null;
     }
     public BasketDTO add(BasketDTO basketDTO) {
         BasketEntity basketEntity = BasketDTO.ToBasketEntity(basketDTO);
@@ -57,27 +62,30 @@ public class BasketService {
                 throw new RuntimeException("Not enough stock available");
             }
 
-            // Update product stock (with optimistic locking handled by @Version)
-            product.setStock(product.getStock() - quantity);
-            productRepository.save(product);
+            // Update product stock
+//            product.setStock(product.getStock() - quantity);
+//            productRepository.save(product);
 
             // Find existing basket item or create new one
             Optional<BasketItem> existingItemOpt = basket.getItems().stream()
                     .filter(item -> item.getProductId().equals(productId))
                     .findFirst();
 
+            long now = System.currentTimeMillis();
             if (existingItemOpt.isPresent()) {
                 BasketItem existingItem = existingItemOpt.get();
+                existingItem.setTimeCreated(now);
                 existingItem.setQuantity(existingItem.getQuantity() + quantity);
                 existingItem.setOriginalPrice(existingItem.getUnitPrice()
                         .multiply(BigDecimal.valueOf(existingItem.getQuantity())));
             } else {
                 BasketItem newItem = BasketItem.FromProductEntity(product, quantity);
                 basket.getItems().add(newItem);
+                basket.setTimeCreated(now);
             }
             // Recalculate basket totals and apply discounts
             recalculateBasket(basket);
-            return BasketDTO.FromBasketEntity(basket);
+            return BasketDTO.FromBasketEntity(basketRepository.save(basket));
         } finally {
             basketLock.unlock();
         }
